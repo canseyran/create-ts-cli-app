@@ -22,59 +22,59 @@ Create TypeScript CLI App is a simple and efficient tool to set up a Node.js Typ
 
 To create a new project, run the following command:
 
-\`\`\`sh
+```sh
 npx @canseyran/create-ts-cli-app <project-directory>
-\`\`\`
+```
 
 Replace \`<project-directory>\` with your desired project folder name.
 
 ### 🛠️ Example
 
-\`\`\`sh
+```sh
 npx @canseyran/create-ts-cli-app random-trivia-app
 cd random-trivia-app
 npm start
-\`\`\`
+```
 
 ## 📜 Available Commands
 
 Once your project is set up, you can use the following npm scripts:
 
 - **Start**: Run the main TypeScript file.
-  \`\`\`sh
+  ```sh
   npm start
-  \`\`\`
+  ```
 
 - **Build**: Bundle your project into a single JavaScript file using Webpack.
-  \`\`\`sh
+  ```sh
   npm run build
-  \`\`\`
+  ```
 
 - **Development Mode**: Watch for changes and recompile automatically.
-  \`\`\`sh
+  ```sh
   npm run dev
-  \`\`\`
+  ```
 
 - **Run Tests**: Execute your unit tests with Vitest.
-  \`\`\`sh
+  ```sh
   npm test
-  \`\`\`
+  ```
 
 - **Watch Tests**: Run your tests in watch mode.
-  \`\`\`sh
+  ```sh
   npm run test:watch
-  \`\`\`
+  ```
 
 - **Format Code**: Format your code with Prettier.
-  \`\`\`sh
+  ```sh
   npm run format
-  \`\`\`
+  ```
 
 ## 📂 Project Structure
 
 After setup, your project structure will look like this:
 
-\`\`\`
+```
 <project-directory>
 ├── README.md
 ├── eslint.config.mjs
@@ -85,7 +85,7 @@ After setup, your project structure will look like this:
 ├── tsconfig.json
 ├── vitest.config.ts
 └── webpack.config.js
-\`\`\`
+```
 
 ## 🤝 Contributing
 
