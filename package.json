@@ -9,7 +9,7 @@
     "create-ts-cli-app": "bin/install.js"
   },
   "keywords": [],
-  "author": "Can Seyran",
+  "author": "Ogulcan Seyran",
   "license": "ISC",
   "type": "module",
   "dependencies": {
