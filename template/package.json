@@ -5,9 +5,7 @@
   "main": "./src/main.ts",
   "scripts": {
     "start": "tsx ./src/main.ts",
-    "build:script": "esbuild ./src/main.ts --target=es2020 --bundle --minify --platform=node --banner:js='#!/usr/bin/env node' --outfile=./dist/app",
-    "build:webpack": "webpack",
-    "build:js": "esbuild ./src/main.ts --format=esm --bundle --minify --platform=node --outfile=./dist/app.js",
+    "build": "webpack",
     "dev": "tsx watch ./src/main.ts",
     "test": "vitest run",
     "test:watch": "vitest .",
