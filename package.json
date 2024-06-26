@@ -8,7 +8,37 @@
   "bin": {
     "create-ts-cli-app": "bin/install.js"
   },
-  "keywords": [],
+  "keywords": [
+    "typescript",
+    "cli",
+    "command-line",
+    "nodejs",
+    "webpack",
+    "eslint",
+    "prettier",
+    "vitest",
+    "chalk",
+    "commander",
+    "inquirer",
+    "typescript-cli",
+    "node-cli",
+    "create-cli-app",
+    "typescript-starter",
+    "nodejs-starter",
+    "starter-project",
+    "easy-setup",
+    "quick-start",
+    "typescript-tooling",
+    "javascript",
+    "tooling",
+    "code-quality",
+    "unit-testing",
+    "code-formatting",
+    "easy-install",
+    "beginner-friendly",
+    "scaffold",
+    "prototype"
+  ],
   "author": "Ogulcan Seyran",
   "license": "ISC",
   "type": "module",
@@ -24,5 +54,5 @@
     "url": "https://github.com/canseyran/create-ts-cli-app/issues"
   },
   "homepage": "https://github.com/canseyran/create-ts-cli-app#readme",
-  "description": ""
+  "description": "Create TypeScript CLI App is a simple and efficient tool to set up a Node.js TypeScript project with minimal hassle. It comes pre-configured with essential tools and libraries, allowing you to focus on writing your code rather than setting up your environment."
 }

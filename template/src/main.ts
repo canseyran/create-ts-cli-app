@@ -3,7 +3,7 @@ import { Command } from "commander";
 const program = new Command();
 
 program
-  .name("trivia-cli")
+  .name("random-trivia-app")
   .description("CLI for fetching random trivia questions")
   .version("1.0.0");
 
