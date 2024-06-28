@@ -10,6 +10,7 @@ const CURRENT_DIRECTORY_IDENTIFIER = '.';
 const DIRECTORY_VALIDATION_REGEXP = /^[^\s^\x00-\x1f\\?*:"";<>|\/.][^\x00-\x1f\\?*:"";<>|\/]*[^\s^\x00-\x1f\\?*:"";<>|\/.]+$/;
 const GREEN_CHECKMARK = chalk.green('✔');
 const TEMPLATE_GITHUB_LINK = "https://github.com/canseyran/ts-cli-app";
+const IS_WINDOWS_PLATFORM = process.platform === "win32";
 
 const ErrorHandlers = {
   MISSING_PROJECT_DIRECTORY: () => {
@@ -65,5 +66,11 @@ StatusMessages.FILES_COPIED(projectDirectoryAbsPath);
 StatusMessages.NPM_INSTALL();
 spawnSync('npm', ['install'], { stdio: 'inherit', cwd: projectDirectoryAbsPath });
 StatusMessages.PACKAGES_INSTALLED();
+
+if (IS_WINDOWS_PLATFORM) {
+  spawnSync('del', ['.git'], { stdio: 'ignore', cwd: projectDirectoryAbsPath });
+} else {
+  spawnSync('rm', ['-rf', '.git'], { stdio: 'ignore', cwd: projectDirectoryAbsPath });
+}
 
 StatusMessages.COMPLETE(projectDirectoryArg);
