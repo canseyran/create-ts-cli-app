@@ -4,14 +4,12 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import chalk from 'chalk';
 import { spawnSync } from 'child_process';
-import { fileURLToPath } from 'url';
-import packageJson from '../template/package.json' assert { type: 'json' };
+import { readFileSync } from 'fs';
 
 const CURRENT_DIRECTORY_IDENTIFIER = '.';
-const TEMPLATE_FOLDER_NAME = 'template';
-const PATHS_TO_EXCLUDE = ['node_modules', 'dist'];
 const DIRECTORY_VALIDATION_REGEXP = /^[^\s^\x00-\x1f\\?*:"";<>|\/.][^\x00-\x1f\\?*:"";<>|\/]*[^\s^\x00-\x1f\\?*:"";<>|\/.]+$/;
 const GREEN_CHECKMARK = chalk.green('✔');
+const TEMPLATE_GITHUB_LINK = "https://github.com/canseyran/ts-cli-app";
 
 const ErrorHandlers = {
   MISSING_PROJECT_DIRECTORY: () => {
@@ -24,81 +22,48 @@ const ErrorHandlers = {
     console.error('Please specify a valid directory name');
     process.exit(1);
   },
-  DIRECTORY_ALREADY_EXISTS: () => {
-    console.error('Specified directory already exists.\nMake sure to provide an unused project directory');
-    process.exit(1);
-  }
 };
 
 const StatusMessages = {
   START: () => console.log('---- Generating Typescript NodeJS CLI App ----'),
   COPYING_FILES: () => console.log('Copying files ...'),
-  FILES_COPIED: (path) => console.log(`Files copied to ${path} ${GREEN_CHECKMARK}`),
+  FILES_COPIED: (dir) => console.log(`Files copied to ${dir} ${GREEN_CHECKMARK}`),
   NPM_INSTALL: () => console.log('Installing packages ...'),
   PACKAGES_INSTALLED: () => console.log(`Packages installed ${GREEN_CHECKMARK}`),
-  COMPLETE: (directory) => console.log(
-    `Completed ${GREEN_CHECKMARK}\nChange into project directory:\n ${chalk.red('cd')} ${chalk.blue(directory)}\nStart in watch mode:\n ${chalk.red('npm run')} ${chalk.blue('dev')}\nUnit testing in watch mode:\n ${chalk.red('npm run')} ${chalk.blue('test:watch')}\nBuild a single file executable node script:\n ${chalk.red('npm run')} ${chalk.blue('build:script')}\n\nCheck package.json for additional scripts, happy coding!`
+  COMPLETE: (dir) => console.log(
+    `Completed ${GREEN_CHECKMARK}\nChange into project directory:\n ${chalk.red('cd')} ${chalk.blue(dir)}\nStart in watch mode:\n ${chalk.red('npm run')} ${chalk.blue('dev')}\nUnit testing in watch mode:\n ${chalk.red('npm run')} ${chalk.blue('test:watch')}\nBuild a single file executable node script:\n ${chalk.red('npm run')} ${chalk.blue('build:script')}\n\nCheck package.json for additional scripts, happy coding!`
   ),
 };
 
-const main = async () => {
-  StatusMessages.START();
+StatusMessages.START();
 
-  const projectDirectoryArg = process.argv[2];
+const projectDirectoryArg = process.argv[2];
+if (!projectDirectoryArg) {
+  ErrorHandlers.MISSING_PROJECT_DIRECTORY();
+}
 
-  if (!projectDirectoryArg) {
-    ErrorHandlers.MISSING_PROJECT_DIRECTORY();
-  }
+const isValidDirectoryName = DIRECTORY_VALIDATION_REGEXP.test(projectDirectoryArg);
+const useCurrentDirectory = projectDirectoryArg.trim() === CURRENT_DIRECTORY_IDENTIFIER;
+if (!isValidDirectoryName && !useCurrentDirectory) {
+  ErrorHandlers.INVALID_PROJECT_DIRECTORY();
+}
 
-  const isValidDirectoryName = DIRECTORY_VALIDATION_REGEXP.test(projectDirectoryArg);
-  const useCurrentDirectory = projectDirectoryArg.trim() === CURRENT_DIRECTORY_IDENTIFIER;
+const projectDirectoryAbsPath = useCurrentDirectory ? process.cwd() : path.join(process.cwd(), projectDirectoryArg);
 
-  if (!isValidDirectoryName && !useCurrentDirectory) {
-    ErrorHandlers.INVALID_PROJECT_DIRECTORY();
-  }
+StatusMessages.COPYING_FILES();
 
-  const projectDirectoryAbsPath = useCurrentDirectory ? process.cwd() : path.join(process.cwd(), projectDirectoryArg);
+spawnSync('git', ['clone', '--depth', '1', TEMPLATE_GITHUB_LINK, projectDirectoryAbsPath]);
 
-  if (!useCurrentDirectory && await fs.stat(projectDirectoryAbsPath).catch(() => false)) {
-    ErrorHandlers.DIRECTORY_ALREADY_EXISTS();
-  }
+const packageJsonAbsPath = path.join(projectDirectoryAbsPath, 'package.json');
+const packageJsonTxt = readFileSync(packageJsonAbsPath, 'utf-8');
+const packageJson = JSON.parse(packageJsonTxt);
+packageJson.name = projectDirectoryArg;
+await fs.writeFile(packageJsonAbsPath, JSON.stringify(packageJson, null, 2));
 
-  StatusMessages.COPYING_FILES();
+StatusMessages.FILES_COPIED(projectDirectoryAbsPath);
 
-  if (!useCurrentDirectory) {
-    await fs.mkdir(projectDirectoryAbsPath, { recursive: true });
-  }
+StatusMessages.NPM_INSTALL();
+spawnSync('npm', ['install'], { stdio: 'inherit', cwd: projectDirectoryAbsPath });
+StatusMessages.PACKAGES_INSTALLED();
 
-  const __dirname = path.dirname(fileURLToPath(import.meta.url));
-  const templateDirectoryAbsPath = path.join(__dirname, '..', TEMPLATE_FOLDER_NAME);
-
-  try {
-    await fs.cp(templateDirectoryAbsPath, projectDirectoryAbsPath, {
-      recursive: true,
-      filter: (source) => {
-        return !PATHS_TO_EXCLUDE.some((excludedPath) => source.includes(excludedPath));
-      }
-    });
-
-    packageJson.name = projectDirectoryArg;
-
-    const packageJsonAbsPath = path.join(projectDirectoryAbsPath, 'package.json');
-    await fs.writeFile(packageJsonAbsPath, JSON.stringify(packageJson, null, 2));
-
-    StatusMessages.FILES_COPIED(projectDirectoryAbsPath);
-
-    StatusMessages.NPM_INSTALL();
-    spawnSync('npm', ['install'], { stdio: 'inherit', cwd: projectDirectoryAbsPath });
-
-    StatusMessages.PACKAGES_INSTALLED();
-    StatusMessages.COMPLETE(projectDirectoryArg);
-  } catch (error) {
-    console.error(`Error copying files: ${error.message}`);
-    process.exit(1);
-  }
-};
-
-main().catch(error => {
-  console.error(`Unexpected error: ${error.message}`);
-  process.exit(1);
-});
+StatusMessages.COMPLETE(projectDirectoryArg);
