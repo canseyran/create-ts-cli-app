@@ -1,10 +1,11 @@
-#!/usr/bin/env node --no-warnings=ExperimentalWarning
+#!/usr/bin/env node
 
-import * as fs from 'fs/promises';
+process.env.NODE_OPTIONS = '--no-warnings=ExperimentalWarning';
+
 import * as path from 'path';
 import chalk from 'chalk';
 import { spawnSync } from 'child_process';
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 
 const CURRENT_DIRECTORY_IDENTIFIER = '.';
 const DIRECTORY_VALIDATION_REGEXP = /^[^\s^\x00-\x1f\\?*:"";<>|\/.][^\x00-\x1f\\?*:"";<>|\/]*[^\s^\x00-\x1f\\?*:"";<>|\/.]+$/;
@@ -53,24 +54,40 @@ const projectDirectoryAbsPath = useCurrentDirectory ? process.cwd() : path.join(
 
 StatusMessages.COPYING_FILES();
 
-spawnSync('git', ['clone', '--depth', '1', TEMPLATE_GITHUB_LINK, projectDirectoryAbsPath]);
+const cloneResult = spawnSync('git', ['clone', '--depth', '1', TEMPLATE_GITHUB_LINK, projectDirectoryAbsPath]);
+if (cloneResult.error) {
+  console.error('Error cloning repository:', cloneResult.error);
+  process.exit(1);
+}
 
 const packageJsonAbsPath = path.join(projectDirectoryAbsPath, 'package.json');
 const packageJsonTxt = readFileSync(packageJsonAbsPath, 'utf-8');
 const packageJson = JSON.parse(packageJsonTxt);
 packageJson.name = projectDirectoryArg;
-await fs.writeFile(packageJsonAbsPath, JSON.stringify(packageJson, null, 2));
+writeFileSync(packageJsonAbsPath, JSON.stringify(packageJson, null, 2));
 
 StatusMessages.FILES_COPIED(projectDirectoryAbsPath);
 
 StatusMessages.NPM_INSTALL();
-spawnSync('npm', ['install'], { stdio: 'inherit', cwd: projectDirectoryAbsPath });
+const npmInstallResult = spawnSync('npm', ['install'], { stdio: 'inherit', cwd: projectDirectoryAbsPath });
+if (npmInstallResult.error) {
+  console.error('Error installing packages:', npmInstallResult.error);
+  process.exit(1);
+}
 StatusMessages.PACKAGES_INSTALLED();
 
 if (IS_WINDOWS_PLATFORM) {
-  spawnSync('del', ['.git'], { stdio: 'ignore', cwd: projectDirectoryAbsPath });
+  const delResult = spawnSync('del', ['.git'], { stdio: 'ignore', cwd: projectDirectoryAbsPath });
+  if (delResult.error) {
+    console.error('Error deleting .git directory:', delResult.error);
+    process.exit(1);
+  }
 } else {
-  spawnSync('rm', ['-rf', '.git'], { stdio: 'ignore', cwd: projectDirectoryAbsPath });
+  const rmResult = spawnSync('rm', ['-rf', '.git'], { stdio: 'ignore', cwd: projectDirectoryAbsPath });
+  if (rmResult.error) {
+    console.error('Error deleting .git directory:', rmResult.error);
+    process.exit(1);
+  }
 }
 
 StatusMessages.COMPLETE(projectDirectoryArg);
