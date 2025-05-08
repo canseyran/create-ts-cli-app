@@ -77,7 +77,13 @@ const StatusMessages = {
         "npm run",
       )} ${chalk.blue(
         "build",
-      )}\n\nCheck package.json for additional scripts, happy coding!`,
+      )}\nSymlink the executable script to global/node scope:\n ${chalk.red(
+        "npm",
+      )} ${chalk.blue("link")}\nUse the symlinked exeutable:\n ${chalk.red(
+        dir,
+      )} ${chalk.blue(
+        "fetch",
+      )}\nCheck package.json for additional scripts, happy coding!`,
     ),
 };
 

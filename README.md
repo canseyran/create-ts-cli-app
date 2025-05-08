@@ -28,12 +28,18 @@ npx @canseyran/create-ts-cli-app <project-directory>
 
 Replace \`<project-directory>\` with your desired project folder name.
 
-### 🛠️ Example
+### 🛠️ Example usage
 
 ```sh
 npx @canseyran/create-ts-cli-app random-trivia-app
+
 cd random-trivia-app
-npm start
+
+npm run build
+
+npm link # Symlinks the script to global/node environment
+
+random-trivia-app fetch # Use symlinked cli tool globally
 ```
 
 ## 📜 Available Commands
@@ -41,26 +47,37 @@ npm start
 Once your project is set up, you can use the following npm scripts:
 
 - **Start**: Run the main TypeScript file.
+
   ```sh
   npm start
   ```
 
 - **Build**: Bundle your project into a single JavaScript file using Webpack.
+
   ```sh
   npm run build
   ```
 
+- **Link**: Symlink the bundled executable into the global / node environment
+
+  ```sh
+  npm link
+  ```
+
 - **Development Mode**: Watch for changes and recompile automatically.
+
   ```sh
   npm run dev
   ```
 
 - **Run Tests**: Execute your unit tests with Vitest.
+
   ```sh
   npm test
   ```
 
 - **Watch Tests**: Run your tests in watch mode.
+
   ```sh
   npm run test:watch
   ```
